@@ -597,7 +597,7 @@ const confirmSelection = async () => {
   showPicker.value = false;
 
   // await nextTick();
-  alert(showPicker.value);
+
 };
 
 const cancelSelection = () => {

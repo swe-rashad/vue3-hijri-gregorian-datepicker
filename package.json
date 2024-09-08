@@ -1,7 +1,8 @@
 {
   "name": "vue3-hijri-gregorian-datepicker",
   "description": "A Vue 3 date picker component that supports both Hijri and Gregorian calendars",
-  "version": "1.0.1",
+  "keywords": ["vue3-hijri-gregorian-datepicker"],
+  "version": "1.0.2",
   "author": "Inayat Ullah",
   "license": "MIT",
   "type": "module",
