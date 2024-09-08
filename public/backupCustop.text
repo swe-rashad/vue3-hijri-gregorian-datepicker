@@ -1,0 +1,346 @@
+<template>
+    <div id="date_picker">
+      <div id="date_picker_input">
+        <label>Datepicker</label>
+        <input 
+          type="text" 
+          id="date" 
+          :value="formattedDate" 
+          readonly 
+          @click="toggleCalendar"
+          :class="{ onFocus: showCalendar }" 
+        />
+      </div>
+      <div id="date_picker_calendar" :class="{ hidden: !showCalendar }">
+        <div id="calendar_header">
+          <button class="cal-btn back" @click="changeMonth(-1)">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABJUlEQVR4nO2Uv0oDQRCHR9BKrAQJ2FgIdnc7njtzSbMzd7lGC80T5DXMW+gzpNJHsPEJYuELBA60EBELsfIfBGIixvNyt0IKP9h2vt3fb1iAfxaCXZt0DGuOrO8+jmHNQ3JHnwLDeutrOI4lJDcTAcngDwSDSUSkCbK++RSEJAdfejCkfX+31/63oq1N15H0rn7Bch80s42Z22SsdGsLrHQLVxZJLioLSC8BYKlQELLbQpanCrk/Y+y2C4dPFd6bP3s9hrI455aR9GqO219HUbRSWjB6xV5qDcnL7wJ5RZs2oQpIelqi2BOoShBkq0g6LMg932m11qAOhnX/5+zlEHyALOczhp+BL6x1DSR9mPoOHsM42QSfGE6yUR+kQxO7ttfhC80HheuaG9wAq10AAAAASUVORK5CYII=">
+          </button>
+          <div class="date-selectors">
+            <select v-model="month" @change="updateMonth">
+              <option v-for="(m, index) in months" :key="index" :value="index">
+                {{ m }}
+              </option>
+            </select>
+            <select v-model="year" @change="updateYear">
+              <option v-for="y in years" :key="y" :value="y">
+                {{ y }}
+              </option>
+            </select>
+          </div>
+          <button class="cal-btn front" @click="changeMonth(1)">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABJUlEQVR4nO2Uv0oDQRCHR9BKrAQJ2FgIdnc7njtzSbMzd7lGC80T5DXMW+gzpNJHsPEJYuELBA60EBELsfIfBGIixvNyt0IKP9h2vt3fb1iAfxaCXZt0DGuOrO8+jmHNQ3JHnwLDeutrOI4lJDcTAcngDwSDSUSkCbK++RSEJAdfejCkfX+31/63oq1N15H0rn7Bch80s42Z22SsdGsLrHQLVxZJLioLSC8BYKlQELLbQpanCrk/Y+y2C4dPFd6bP3s9hrI455aR9GqO219HUbRSWjB6xV5qDcnL7wJ5RZs2oQpIelqi2BOoShBkq0g6LMg932m11qAOhnX/5+zlEHyALOczhp+BL6x1DSR9mPoOHsM42QSfGE6yUR+kQxO7ttfhC80HheuaG9wAq10AAAAASUVORK5CYII=">
+          </button>
+        </div>
+        <div id="cal_wrapper">
+          <div id="cal_days">
+            <div v-for="day in days" :key="day" class="cell_wrapper">
+              <span class="cell_item">{{ day.slice(0, 2) }}</span>
+            </div>
+          </div>
+          <div id="calendar_main">
+            <div v-for="day in monthDetails" :key="day.timestamp" 
+                 class="cell_wrapper"
+                 :class="{ 
+                   current: day.month === 0, 
+                   active: day.timestamp === selectedDay, 
+                   isCurrent: day.timestamp === todayTimestamp, 
+                   isSelected: day.timestamp === selectedDay 
+                 }" 
+                 @click="selectDate(day)">
+              <span class="cell_item">{{ day.date }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    data() {
+      return {
+        days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        year: new Date().getFullYear(),
+        month: new Date().getMonth(),
+        showCalendar: false,
+        selectedDay: Date.now(),
+        todayTimestamp: Date.now() - (Date.now() % (60 * 60 * 24 * 1000)) + new Date().getTimezoneOffset() * 1000 * 60,
+      };
+    },
+    computed: {
+      monthDetails() {
+        return this.getMonthDetails(this.year, this.month);
+      },
+      years() {
+        const currentYear = new Date().getFullYear();
+        return Array.from({ length: 20 }, (_, i) => currentYear - 10 + i);
+      },
+      formattedDate() {
+        return this.getDateStringFromTimestamp(this.selectedDay);
+      }
+    },
+    methods: {
+      getNumberOfDays(year, month) {
+        return 40 - new Date(year, month, 40).getDate();
+      },
+      getDayDetails({ index, numberOfDays, firstDay, year, month }) {
+        let date = index - firstDay;
+        let day = index % 7;
+        let prevMonth = month - 1;
+        let prevYear = year;
+        if (prevMonth < 0) {
+          prevMonth = 11;
+          prevYear--;
+        }
+        let prevMonthNumberOfDays = this.getNumberOfDays(prevYear, prevMonth);
+  
+        let _date = (date < 0 ? prevMonthNumberOfDays + date : date % numberOfDays) + 1;
+        let monthOffset = date < 0 ? -1 : date >= numberOfDays ? 1 : 0;
+        let timestamp = new Date(year, month, _date).getTime();
+        return {
+          date: _date,
+          day,
+          month: monthOffset,
+          timestamp,
+          dayString: this.days[day]
+        };
+      },
+      getMonthDetails(year, month) {
+        let firstDay = new Date(year, month).getDay();
+        let numberOfDays = this.getNumberOfDays(year, month);
+        let monthArray = [];
+        let rows = 5;
+        let index = 0;
+        let cols = 7;
+  
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            monthArray.push(this.getDayDetails({
+              index,
+              numberOfDays,
+              firstDay,
+              year,
+              month
+            }));
+            index++;
+          }
+        }
+        return monthArray;
+      },
+      getDateStringFromTimestamp(timestamp) {
+        let dateObject = new Date(timestamp);
+        let month = dateObject.getMonth();
+        let date = dateObject.getDate();
+        return `${this.months[month]} ${date}, ${dateObject.getFullYear()}`;
+      },
+      setDateToInput(timestamp) {
+        this.selectedDay = timestamp;
+      },
+      toggleCalendar() {
+        this.showCalendar = !this.showCalendar;
+      },
+      changeMonth(offset) {
+        this.month += offset;
+        if (this.month === -1) {
+          this.month = 11;
+          this.year--;
+        } else if (this.month === 12) {
+          this.month = 0;
+          this.year++;
+        }
+        this.updateMonth();
+      },
+      updateMonth() {
+        this.monthDetails = this.getMonthDetails(this.year, this.month);
+      },
+      updateYear() {
+        this.updateMonth();
+      },
+      selectDate(day) {
+        if (day.timestamp === this.selectedDay) {
+          return;
+        }
+        this.setDateToInput(day.timestamp);
+      }
+    },
+    watch: {
+      year() {
+        this.updateMonth();
+      },
+      month() {
+        this.updateMonth();
+      }
+    }
+  };
+  </script>
+  
+  <style scoped>
+  #date_picker {
+    width: 300px;
+    margin: 0 auto;
+    transform: scale(1.2);
+    position: relative;
+    top: 15%;
+  }
+  
+  #date_picker_input {
+    margin-bottom: 8px;
+    position: relative;
+  }
+  
+  label {
+    display: block;
+    color: #8A8F9F;
+    font-size: 1.02rem;
+    font-weight: 300;
+    margin-bottom: 10px;
+  }
+  
+  #date {
+    color: var(--dark-date-foreground);
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+  
+  #date:hover {
+    cursor: pointer;
+  }
+  
+  #date.onFocus:focus {
+    outline: none;
+  }
+  
+  #date_picker_input:after {
+    content: "▾";
+    padding: 12px 15px;
+    position: absolute;
+    right: 4px;
+    top: 42%;
+    color: #8A8F9F;
+  }
+  
+  #date_picker_input.showCal:after {
+    transform: rotate(180deg);
+  }
+  
+  #date_picker_calendar {
+    min-height: fit-content;
+    box-shadow: 10px 10px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+    padding: 12px;
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: auto; /* Enables vertical scrolling */
+  }
+  
+  #cal_wrapper {
+    overflow: auto; /* Enables scrolling for calendar body */
+  }
+  
+  #calendar_header {
+    width: 100%;
+    min-height: 30px;
+    margin-bottom: 8px;
+    color: var(--dark-date-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .cal-btn {
+    width: 20px;
+    height: 20px;
+    background: var(--dark-arrows-bg);
+    border: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 6px;
+  }
+  
+  .cal-btn img {
+    width: 42%;
+    height: 42%;
+  }
+  
+  .cal-btn.back img {
+    transform: rotate(90deg);
+  }
+  
+  .cal-btn.front img {
+    transform: rotate(-90deg);
+  }
+  
+  .date-selectors {
+    display: flex;
+    gap: 10px;
+    overflow: auto; /* Enables horizontal scrolling if needed */
+  }
+  
+  .date-selectors select {
+    flex: 1;
+  }
+  
+  #cal_days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 5px;
+    column-gap: 5px;
+    color: var(--dark-inactive-fg);
+    overflow: hidden;
+  }
+  
+  #calendar_main {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 5px;
+    column-gap: 5px;
+    color: var(--dark-inactive-fg);
+    grid-template-rows: repeat(5, min(30px));
+  }
+  
+  .cell_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .current {
+    background: var(--dark-current-year);
+    color: var(--dark-current-year-fg);
+  }
+  
+  .current:not(.active):hover {
+    background: var(--dark-hover);
+    color: var(--dark-date-foreground);
+    border: 2px solid var(--dark-selected);
+  }
+  
+  .cal-btn:hover,
+  .current:hover {
+    cursor: pointer;
+  }
+  
+  .active {
+    background: var(--dark-selected);
+    color: var(--dark-date-foreground);
+  }
+  
+  .inactive_indicator:after {
+    content: '';
+    width: 3px;
+    height: 3px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  </style>
+  
