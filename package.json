@@ -32,7 +32,7 @@
   "publishConfig": {
   "registry":"https://npm.pkg.github.com/@explainerkhan"
 },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "Inayat Ullah",
   "license": "MIT",
   "type": "module",
