@@ -22,6 +22,16 @@
     "umm al qura converter",
     "convert umm al qura"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/inaat/vue3-hijri-gregorian-datepicker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/inaat/vue3-hijri-gregorian-datepicker/issues"
+  },
+  "publishConfig": {
+  "registry":"https://npm.pkg.github.com/@explainerkhan"
+},
   "version": "1.0.3",
   "author": "Inayat Ullah",
   "license": "MIT",
