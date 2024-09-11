@@ -33,7 +33,7 @@
   "@explainerkhan:registry": "https://npm.pkg.github.com"
 },
   "version": "1.0.4",
-  "author": "Inayat Ullah",
+  "author": "Inayat  Ullah",
   "license": "MIT",
   "type": "module",
   "main": "dist/vue3-hijri-gregorian-datepicker.umd.js",
