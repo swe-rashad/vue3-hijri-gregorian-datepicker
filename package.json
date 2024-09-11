@@ -29,9 +29,7 @@
   "bugs": {
     "url": "https://github.com/inaat/vue3-hijri-gregorian-datepicker/issues"
   },
-  "publishConfig": {
-  "@explainerkhan:registry": "https://npm.pkg.github.com"
-},
+
   "version": "1.0.4",
   "author": "Inayat  Ullah",
   "license": "MIT",
