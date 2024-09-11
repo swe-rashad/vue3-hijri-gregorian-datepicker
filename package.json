@@ -1,5 +1,5 @@
 {
-  "name": "@inaat/vue3-hijri-gregorian-datepicker",
+  "name": "@explainerkhan/vue3-hijri-gregorian-datepicker",
   "description": "A Vue 3 date picker component that supports both Hijri and Gregorian calendars",
   "keywords": [
     "vue3-hijri-gregorian-datepicker",
@@ -30,7 +30,7 @@
     "url": "https://github.com/inaat/vue3-hijri-gregorian-datepicker/issues"
   },
   "publishConfig": {
-  "registry":"https://npm.pkg.github.com/"
+  "@explainerkhan:registry": "https://npm.pkg.github.com"
 },
   "version": "1.0.4",
   "author": "Inayat Ullah",
