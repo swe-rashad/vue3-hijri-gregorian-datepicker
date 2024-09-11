@@ -26,10 +26,13 @@ Here is a basic example of how to use the vue3-hijri-gregorian-datepicker in you
 ```vue
 <template>
     <DatePicker 
-      :initialType="calendarType" 
+     :initialType="calendarType" 
       :withTime="true" 
       v-model="selectedDate" 
       :language="'en'" 
+       format="dd-mm-yyyy HH:mm"
+      :darkTheme="false"
+    />
     />
     <div v-if="selectedDate">
         <p>Selected Date: {{ selectedDate.date }}</p>
@@ -68,6 +71,7 @@ export default {
 - `format` (String): The format for displaying the date and time.
 - `disabled` (Boolean): Disables the date picker. Default is `false`.
 - `readOnly` (Boolean): Makes the date picker read-only. Default is `true`.
+- `darkTheme` (Boolean): The default theme is light . Default is `false`.
 - `placeholder` (String): Placeholder text for the date input field. Default is 'Select date'.
 ## Events
 

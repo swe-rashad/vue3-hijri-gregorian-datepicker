@@ -4,7 +4,9 @@
       :initialType="calendarType" 
       :withTime="true" 
       v-model="selectedDate" 
-      :language="'ar'" 
+      :language="'en'" 
+       format="dd-mm-yyyy HH:mm"
+      :darkTheme="false"
     />
     <!-- Display the selected date and type -->
     <p>Selected Date: {{ selectedDate.date }}</p>

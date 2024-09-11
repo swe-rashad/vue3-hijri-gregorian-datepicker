@@ -1,5 +1,5 @@
 <template>
-  <div class="datepicker dp__main dp__theme_light">
+  <div  :class="['datepicker','dp__main', themeClass]">
     <!-- Input field to trigger the date picker -->
     <div class="datepicker-input" @click="openDatePicker">
       <input class="dp__pointer dp__input_readonly dp__input dp__input_icon_pad dp__input_focus dp__input_reg"  type="text" :value="formattedDate" :readOnly="readOnly" :placeholder="placeholder"
@@ -12,7 +12,7 @@
 
     <!-- Date picker dialog with transition -->
     <transition name="fade">
-      <div class="datepicker-overlay dp__menu dp__menu_index dp__theme_light" v-if="showPicker">
+      <div  :class="['datepicker-overlay', themeClass, 'dp__menu dp__menu_index']" v-if="showPicker">
         <div class="datepicker-dialog">
           <div class="calendar">
             <div class="calendar-header">
@@ -197,23 +197,34 @@ const props = defineProps({
       type: String,
       default: 'Select date',
     },
+    darkTheme: {
+      type: Boolean,
+      default: false // Default to dark theme
+    }
+
 });
 
 const emit = defineEmits(["update:modelValue", "cancel"]);
 
+const themeClass = computed(() => props.darkTheme ? 'dp__theme_dark' : 'dp__theme_light');
 const isHijri = ref(props.initialType === "hijri");
 const showPicker = ref(false);
 const showTime = ref(false);
 const currentDate = ref(
   isHijri.value ? moment().startOf("day").toDate() : new Date()
 );
-const multiple = ref(props.multiple);
 const selectedDate = ref(currentDate.value);
-const selectedHour = ref(0);
-const selectedMinute = ref(0);
-const selectedSecond = ref(0);
+const selectedHour = ref(currentDate.value.getHours());
+const selectedMinute = ref(currentDate.value.getMinutes());
+const selectedSecond = ref(currentDate.value.getSeconds());
+
+
 const isYearSelection = ref(false);
 const isMonthSelection = ref(false);
+
+
+
+
 const yearRangeStart = ref(isHijri.value ? 1400 : 2000);
 const formattedHour = computed(() => pad(selectedHour.value));
 const formattedMinute = computed(() => pad(selectedMinute.value));
@@ -410,6 +421,10 @@ const selectMonth = (monthIndex) => {
 const selectDate = (date) => {
   if (date) {
     selectedDate.value = date;
+ 
+    confirmSelection();
+    
+    
   }
 };
 
@@ -589,18 +604,21 @@ const calculateDaysInMonth = () => {
 const openDatePicker = () => {
   showPicker.value = true;
 };
-
 const formattedDate = computed(() => {
+  // Set default formats based on Hijri or Gregorian, and with or without time
   const defaultFormat = isHijri.value ? "iYYYY/iMM/iDD" : "yyyy-MM-dd";
   const timeFormat = isHijri.value
     ? "iYYYY/iMM/iDD HH:mm:ss"
     : "yyyy-MM-dd HH:mm:ss";
 
+  // If a custom format is provided, use it; otherwise, use default formats
   const formatString = props.format
     ? props.format
     : props.withTime
       ? timeFormat
       : defaultFormat;
+
+  // Update the selected date with the correct hours, minutes, and seconds
   selectedDate.value.setHours(
     selectedHour.value,
     selectedMinute.value,
@@ -608,10 +626,34 @@ const formattedDate = computed(() => {
     0
   );
 
+  // Format the date using Moment.js for Hijri and date-fns for Gregorian
   return isHijri.value
     ? moment(selectedDate.value).format(formatString)
     : format(selectedDate.value, formatString);
 });
+
+// const formattedDate = computed(() => {
+//   const defaultFormat = isHijri.value ? "iYYYY/iMM/iDD" : "yyyy-MM-dd";
+//   const timeFormat = isHijri.value
+//     ? "iYYYY/iMM/iDD HH:mm:ss"
+//     : "yyyy-MM-dd HH:mm:ss";
+
+//   const formatString = props.format
+//     ? props.format
+//     : props.withTime
+//       ? timeFormat
+//       : defaultFormat;
+//   selectedDate.value.setHours(
+//     selectedHour.value,
+//     selectedMinute.value,
+//     selectedSecond.value,
+//     0
+//   );
+
+//   return isHijri.value
+//     ? moment(selectedDate.value).format(formatString)
+//     : format(selectedDate.value, formatString);
+// });
 
 
 onMounted(() => {

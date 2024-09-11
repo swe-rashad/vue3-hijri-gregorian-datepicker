@@ -98,7 +98,7 @@
 .datepicker-input {
     display: flex;
     align-items: center;
-    border: 1px solid #ccc;
+    border: 1px solid var(--dp-border-color);
     border-radius: 4px;
     padding: 8px;
     cursor: pointer;
@@ -141,7 +141,7 @@
 }
 
 .datepicker-dialog {
-    background: white;
+    background: var(--dp-background-color);
     padding: 20px;
     border-radius: 8px;
     min-width: 300px;
@@ -172,12 +172,14 @@
     align-items: center;
     margin-bottom: 1em;
     cursor: pointer;
+    color: var(--dp-text-color);
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5em;
+    
 }
 
 .calendar-day-header,
@@ -185,7 +187,8 @@
     text-align:center;
  
     box-sizing:border-box;
-    color:var(--dp-text-color)
+    color:var(--dp-text-color);
+    border: 1px solid var(--dp-border-color);
 }
 
 .calendar-day {
@@ -204,21 +207,23 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 1em;
+    color: #005cb2;
 }
 
 .year-selection div,
 .month-selection div {
     cursor: pointer;
     padding: 5px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--dp-border-color);
     border-radius: 4px;
     text-align: center;
+    color: var(--dp-text-color);
 }
 
 .year-selection .selected,
 .month-selection .selected {
     background-color: #42b983;
-    color: white;
+    color: var(--dp-text-color);
 }
 
 .time-scroller {
@@ -241,8 +246,8 @@
 }
 
 .time-list li.selected {
-    background-color: #E6F7FF;
-    color: black;
+    background-color: var(--dp-background-color);
+    color: var(--dp-text-color);
     border-radius: 4px;
 }
 
