@@ -32,8 +32,8 @@ Here is a basic example of how to use the vue3-hijri-gregorian-datepicker in you
       :language="'en'" 
     />
     <div v-if="selectedDate">
-      <h3>Selected Date & Time:</h3>
-      <p>{{ selectedDate }}</p>
+        <p>Selected Date: {{ selectedDate.date }}</p>
+        <p>Calendar Type: {{ selectedDate.type }}</p>
     </div>
 </template>
 
@@ -47,8 +47,11 @@ export default {
   },
   data() {
     return {
-      calendarType: 'gregorian',
-      selectedDate: null,
+        calendarType: 'gregorian',
+      selectedDate: {
+        date: this.getCurrentDateTime(),
+        type: 'gregorian',
+      },
     };
   },
 };
@@ -60,10 +63,12 @@ export default {
 
 - `initialType` (String): Specifies the initial calendar type. Can be 'gregorian' or 'hijri'. Default is 'gregorian'.
 - `withTime` (Boolean): Enables time selection (hours, minutes, seconds). Default is `false`.
-- `modelValue` (String): The selected date and time value in UTC format.
+- `modelValue` (Object): The selected date and time value in UTC format , Calender type.
 - `language` (String): The language for the UI. Can be 'en' for English or 'ar' for Arabic. Default is 'en'.
 - `format` (String): The format for displaying the date and time.
-
+- `disabled` (Boolean): Disables the date picker. Default is `false`.
+- `readOnly` (Boolean): Makes the date picker read-only. Default is `true`.
+- `placeholder` (String): Placeholder text for the date input field. Default is 'Select date'.
 ## Events
 
 - `update:modelValue`: Emits the selected date and time value in UTC format.
