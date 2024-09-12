@@ -5,10 +5,10 @@
       :withTime="true" 
       v-model="selectedDate" 
       :language="'en'" 
-       format="dd-mm-yyyy HH:mm"
-      :darkTheme="false"
+      :darkTheme="true"
     />
-    <!-- Display the selected date and type -->
+    <!-- :format="'yyyy-MM-dd HH:mm:ss '" -->
+    <!-- Display the selected date and type     format="dd-mm-yyyy HH:mm" -->
     <p>Selected Date: {{ selectedDate.date }}</p>
     <p>Calendar Type: {{ selectedDate.type }}</p>
   </div>
@@ -25,6 +25,7 @@
   },
   data() {
     return {
+
       calendarType: 'gregorian',
       selectedDate: {
         date: this.getCurrentDateTime(),

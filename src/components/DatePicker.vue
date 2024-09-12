@@ -479,7 +479,7 @@ const switchCalendar = () => {
     selectedDate.value = moment(convertedDate, "iYYYY/iMM/iDD").toDate();
   } else {
     try {
-      convertedDate = moment(selectedDate.value).format("YYYY-MM-DD");
+      convertedDate = moment(selectedDate.value).format("DD-MM-YYYY");
       selectedDate.value = new Date(convertedDate);
     } catch (error) {
       console.error("Error converting Hijri date to Gregorian:", error);
@@ -507,16 +507,12 @@ const isSelected = (date) => {
   return date && date.toDateString() === selectedDate.value.toDateString();
 };
 
-
 const confirmSelection = async () => {
+  // Create a new date object with selected time
   const finalDate = new Date(selectedDate.value);
-  finalDate.setHours(
-    selectedHour.value,
-    selectedMinute.value,
-    selectedSecond.value,
-    0
-  );
-  
+  finalDate.setHours(selectedHour.value, selectedMinute.value, selectedSecond.value, 0);
+
+  // Convert the date to UTC for consistency
   const adjustedDate = new Date(
     Date.UTC(
       finalDate.getFullYear(),
@@ -527,17 +523,27 @@ const confirmSelection = async () => {
       finalDate.getSeconds()
     )
   );
-  
+
+  // Determine the calendar type and format accordingly
   const calendarType = isHijri.value ? "hijri" : "gregorian";
- 
+
+  let formattedDate;
+  if (calendarType === "hijri") {
+    formattedDate = moment(adjustedDate).format("iDD-iMM-iYYYY HH:mm:ss"); // Hijri format
+  } else {
+    formattedDate = format(adjustedDate, "dd-MM-yyyy HH:mm:ss"); // Gregorian format
+  }
+
+  // Emit the formatted date along with calendar type
   emit("update:modelValue", {
-    date: adjustedDate.toISOString(),
-    type: calendarType, // Include the calendar type (Hijri or Gregorian)
+    date: formattedDate,
+    type: calendarType,
   });
 
-
+  // Close the date picker
   showPicker.value = false;
 };
+
 const cancelSelection = () => {
   emit("cancel");
   showPicker.value = false;
@@ -606,10 +612,10 @@ const openDatePicker = () => {
 };
 const formattedDate = computed(() => {
   // Set default formats based on Hijri or Gregorian, and with or without time
-  const defaultFormat = isHijri.value ? "iYYYY/iMM/iDD" : "yyyy-MM-dd";
+  const defaultFormat = isHijri.value ? "iDD-iMM-iYYYY" : "dd-MM-yyyy";
   const timeFormat = isHijri.value
-    ? "iYYYY/iMM/iDD HH:mm:ss"
-    : "yyyy-MM-dd HH:mm:ss";
+    ? "iDD-iMM-iYYYY  HH:mm:ss"
+    : "dd-MM-yyyy  HH:mm:ss";
 
   // If a custom format is provided, use it; otherwise, use default formats
   const formatString = props.format
@@ -632,46 +638,36 @@ const formattedDate = computed(() => {
     : format(selectedDate.value, formatString);
 });
 
-// const formattedDate = computed(() => {
-//   const defaultFormat = isHijri.value ? "iYYYY/iMM/iDD" : "yyyy-MM-dd";
-//   const timeFormat = isHijri.value
-//     ? "iYYYY/iMM/iDD HH:mm:ss"
-//     : "yyyy-MM-dd HH:mm:ss";
-
-//   const formatString = props.format
-//     ? props.format
-//     : props.withTime
-//       ? timeFormat
-//       : defaultFormat;
-//   selectedDate.value.setHours(
-//     selectedHour.value,
-//     selectedMinute.value,
-//     selectedSecond.value,
-//     0
-//   );
-
-//   return isHijri.value
-//     ? moment(selectedDate.value).format(formatString)
-//     : format(selectedDate.value, formatString);
-// });
-
 
 onMounted(() => {
   if (props.modelValue && props.modelValue.date && props.modelValue.type) {
+    // Set calendar type
     isHijri.value = props.modelValue.type === "hijri";
 
-    selectedDate.value = isHijri.value
-      ? moment.utc(props.modelValue.date).local().toDate()
-      : new Date(props.modelValue.date);
+    // Convert the date based on the calendar type
+    if (isHijri.value) {
+      // Convert Hijri date to Gregorian date
+      selectedDate.value = moment(props.modelValue.date, "iDD-iMM-iYYYY").toDate();
+    } else {
+      // Use the Gregorian date directly
+      selectedDate.value = new Date(props.modelValue.date);
+    }
 
+    // Extract time components
     selectedHour.value = selectedDate.value.getHours();
     selectedMinute.value = selectedDate.value.getMinutes();
     selectedSecond.value = selectedDate.value.getSeconds();
   } else {
+    // Default to the current date and time
     selectedDate.value = isHijri.value
-      ? moment().startOf("day").toDate()
-      : new Date();
+      ? moment().startOf("day").toDate()  // Hijri default
+      : new Date();                     // Gregorian default
+    selectedHour.value = selectedDate.value.getHours();
+    selectedMinute.value = selectedDate.value.getMinutes();
+    selectedSecond.value = selectedDate.value.getSeconds();
   }
+
+  // Update visible years in the calendar
   updateVisibleYears();
 });
 
@@ -682,47 +678,9 @@ onMounted(() => {
 
 
 
-// const confirmSelection = async () => {
-//   const finalDate = new Date(selectedDate.value);
-//   finalDate.setHours(
-//     selectedHour.value,
-//     selectedMinute.value,
-//     selectedSecond.value,
-//     0
-//   );
-//   const adjustedDate = new Date(
-//     Date.UTC(
-//       finalDate.getFullYear(),
-//       finalDate.getMonth(),
-//       finalDate.getDate(),
-//       finalDate.getHours(),
-//       finalDate.getMinutes(),
-//       finalDate.getSeconds()
-//     )
-//   );
-//   emit("update:modelValue", adjustedDate.toISOString());
-
-//   showPicker.value = false;
-
-//   // await nextTick();
-
-// };
 
 
-// onMounted(() => {
-//   if (props.modelValue) {
-//     selectedDate.value = isHijri.value
-//       ? moment.utc(props.modelValue).local().toDate()
-//       : new Date(props.modelValue);
 
-//     selectedHour.value = selectedDate.value.getHours();
-//     selectedMinute.value = selectedDate.value.getMinutes();
-//     selectedSecond.value = selectedDate.value.getSeconds();
-//   } else {
-//     selectedDate.value = isHijri.value
-//       ? moment().startOf("day").toDate()
-//       : new Date();
-//   }
-//   updateVisibleYears();
-// });
+
+
 </script>
