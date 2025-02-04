@@ -611,6 +611,11 @@ const openDatePicker = () => {
   showPicker.value = true;
 };
 const formattedDate = computed(() => {
+  // console.log('selectedDate.value', selectedDate.value,props.modelValue.date)
+  
+  if (!props.modelValue.date) {
+    return ''; // Return an empty string or a placeholder if the date is null or undefined
+  }
   // Set default formats based on Hijri or Gregorian, and with or without time
   const defaultFormat = isHijri.value ? "iDD-iMM-iYYYY" : "dd-MM-yyyy";
   const timeFormat = isHijri.value
